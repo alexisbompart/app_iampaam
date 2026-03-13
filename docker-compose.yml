@@ -9,6 +9,7 @@ services:
       - "8080:80"  # Mapeamos el puerto 80 del contenedor al 8080 del host
     volumes:
       - .:/var/www/html  # Montamos el código de Laravel
+      - ./laravel.conf:/etc/apache2/sites-available/000-default.conf
       - ./php.ini:/usr/local/etc/php/php.ini  # Opcional: configuración personalizada de PHP
     environment:
       - DB_CONNECTION=pgsql
