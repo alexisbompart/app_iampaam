@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   app:
-    build: . #image:php:8.2-apache  # Usamos imagen oficial con Apache y PHP 8.2
+    build: .
+    #image:php:8.2-apache  # Usamos imagen oficial con Apache y PHP 8.2
     container_name: laravel_app
     restart: unless-stopped
     ports:
