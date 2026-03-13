@@ -1,12 +1,14 @@
 FROM php:8.2-apache
 
-# Instalar extensiones necesarias para Laravel y PostgreSQL
+# Instalar extensiones y herramientas necesarias
 RUN apt-get update && apt-get install -y \
     libpq-dev \
-    && docker-php-ext-install pdo_pgsql pdo_mysql
+    unzip \
+    git \
+    && docker-php-ext-install pdo_pgsql zip
 
-# Habilitar mod_rewrite de Apache (para Laravel)
+# Habilitar mod_rewrite (para Laravel)
 RUN a2enmod rewrite
 
-# Copiar configuración personalizada de PHP (opcional)
-COPY php.ini /usr/local/etc/php/
+# Copiar configuración personalizada de PHP (si tienes php.ini)
+# COPY php.ini /usr/local/etc/php/
