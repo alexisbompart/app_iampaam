@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  app:
+    image: php:8.2-apache  # Usamos imagen oficial con Apache y PHP 8.2
+    container_name: laravel_app
+    restart: unless-stopped
+    ports:
+      - "8080:80"  # Mapeamos el puerto 80 del contenedor al 8080 del host
+    volumes:
+      - ./src:/var/www/html  # Montamos el código de Laravel
+      - ./php.ini:/usr/local/etc/php/php.ini  # Opcional: configuración personalizada de PHP
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=laravel
+      - DB_USERNAME=laravel_user
+      - DB_PASSWORD=secret
+    depends_on:
+      - db
+    networks:
+      - laravel_net
+
+  db:
+    image: postgres:15  # Versión reciente de PostgreSQL
+    container_name: laravel_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: laravel
+      POSTGRES_USER: laravel_user
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"  # Opcional: exponer PostgreSQL al host (solo si necesitas acceso externo)
+    networks:
+      - laravel_net
+
+volumes:
+  pgdata:
+
+networks:
+  laravel_net:
+    driver: bridge
