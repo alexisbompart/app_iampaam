@@ -623,16 +623,6 @@
     </div>
 </div>
 @endsection
-            </div>
-            <div class="col-md-6">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $beneficiario->email) }}">
-                @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-        </div>
-
-        <h3>3. Datos Socioeconómicos</h3>
-        <div class="mb-3">
             <label class="form-label">¿Recibe algún tipo de ayuda económica?</label><br>
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" id="ayuda_si" name="ayuda_economica" value="si" {{ old('ayuda_economica') == 'si' ? 'checked' : '' }}>
