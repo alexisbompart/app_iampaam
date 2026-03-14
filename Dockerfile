@@ -18,12 +18,3 @@ RUN a2enmod rewrite
 # Copiar configuración personalizada de PHP (si tienes php.ini)
 # COPY php.ini /usr/local/etc/php/
 
-# Instalar dependencias de PHP (Composer) y Node
-WORKDIR /var/www/html
-RUN composer install --no-dev --optimize-autoloader \
-    && npm install \
-    && npm run build
-
-# Configurar permisos
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
