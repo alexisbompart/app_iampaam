@@ -10,7 +10,8 @@ class ProductosController extends Controller
 {
     public function index()
     {
-        $productos = Producto::all();
+        $productos = Producto::with(['ordenEntregaItems.ordenEntrega.beneficiario'])->get();
+
         return view('productos.index', compact('productos'));
     }
 

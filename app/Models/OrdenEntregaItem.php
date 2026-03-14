@@ -8,7 +8,12 @@ class OrdenEntregaItem extends Model
 {
     protected $fillable = ['orden_entrega_id', 'producto_id', 'cantidad', 'lote', 'fecha_vencimiento'];
 
-    public function orden()
+    protected $casts = [
+        'fecha_vencimiento' => 'date',
+        'cantidad' => 'integer'
+    ];
+
+    public function ordenEntrega()
     {
         return $this->belongsTo(OrdenEntrega::class, 'orden_entrega_id');
     }
