@@ -708,28 +708,34 @@
             <label class="form-label">Gastos Principales</label><br>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="gasto_alimentacion" name="gastos[]" value="Alimentacion" {{ in_array('Alimentacion', old('gastos', json_decode($beneficiario->gastos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="gasto_alimentacion">Alimentación</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="gasto_entretenimiento" name="gastos[]" value="Entretenimiento" {{ in_array('Entretenimiento', old('gastos', json_decode($beneficiario->gastos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="gasto_entretenimiento">Entretenimiento</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="gasto_medicina" name="gastos[]" value="Medicina" {{ in_array('Medicina', old('gastos', json_decode($beneficiario->gastos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="gasto_medicina">Medicina</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="gasto_otro" name="gastos[]" value="Otro" {{ in_array('Otro', old('gastos', json_decode($beneficiario->gastos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="gasto_otro">Otro</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="gasto_ninguno" name="gastos[]" value="Ninguno" {{ in_array('Ninguno', old('gastos', json_decode($beneficiario->gastos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="gasto_ninguno">Ninguno</label>
-                    </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="gasto_alimentacion" name="gastos[]" value="Alimentacion" {{ in_array('Alimentacion', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="gasto_alimentacion">Alimentación</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="gasto_entretenimiento" name="gastos[]" value="Entretenimiento" {{ in_array('Entretenimiento', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="gasto_entretenimiento">Entretenimiento</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="gasto_medicina" name="gastos[]" value="Medicina" {{ in_array('Medicina', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="gasto_medicina">Medicina</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="gasto_servicios" name="gastos[]" value="Servicios basicos" {{ in_array('Servicios basicos', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="gasto_servicios">Servicios básicos</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="gasto_transporte" name="gastos[]" value="Transporte" {{ in_array('Transporte', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="gasto_transporte">Transporte</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="gasto_vivienda" name="gastos[]" value="Vivienda" {{ in_array('Vivienda', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="gasto_vivienda">Vivienda</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="gasto_otro" name="gastos[]" value="Otro" {{ in_array('Otro', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="gasto_otro">Otro</label>
+                        </div>
                 </div>
             </div>
         </div>
@@ -738,32 +744,30 @@
             <label class="form-label">Discapacidad</label><br>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="discapacidad_fisica" name="discapacidad[]" value="Física o Motora" {{ in_array('Física o Motora', old('discapacidad', json_decode($beneficiario->discapacidad, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="discapacidad_fisica">Física o Motora</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="discapacidad_visual" name="discapacidad[]" value="Sensorial-Visual" {{ in_array('Sensorial-Visual', old('discapacidad', json_decode($beneficiario->discapacidad, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="discapacidad_visual">Sensorial-Visual</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="discapacidad_auditiva" name="discapacidad[]" value="Sensorial-Auditiva" {{ in_array('Sensorial-Auditiva', old('discapacidad', json_decode($beneficiario->discapacidad, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="discapacidad_auditiva">Sensorial-Auditiva</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="discapacidad_intelectual" name="discapacidad[]" value="Intelectual o Cognitiva" {{ in_array('Intelectual o Cognitiva', old('discapacidad', json_decode($beneficiario->discapacidad, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="discapacidad_intelectual">Intelectual o Cognitiva</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="discapacidad_psicosocial" name="discapacidad[]" value="Psicosocial o Mental" {{ in_array('Psicosocial o Mental', old('discapacidad', json_decode($beneficiario->discapacidad, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="discapacidad_psicosocial">Psicosocial o Mental</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="discapacidad_ninguna" name="discapacidad[]" value="Ninguna de las anteriores" {{ in_array('Ninguna de las anteriores', old('discapacidad', json_decode($beneficiario->discapacidad, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="discapacidad_ninguna">Ninguna de las anteriores</label>
-                    </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="discapacidad_fisica" name="discapacidad[]" value="Física o Motora" {{ in_array('Física o Motora', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="discapacidad_fisica">Física o Motora</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="discapacidad_visual" name="discapacidad[]" value="Sensorial-Visual" {{ in_array('Sensorial-Visual', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="discapacidad_visual">Sensorial-Visual</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="discapacidad_auditiva" name="discapacidad[]" value="Sensorial-Auditiva" {{ in_array('Sensorial-Auditiva', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="discapacidad_auditiva">Sensorial-Auditiva</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="discapacidad_intelectual" name="discapacidad[]" value="Intelectual o Cognitiva" {{ in_array('Intelectual o Cognitiva', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="discapacidad_intelectual">Intelectual o Cognitiva</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="discapacidad_psicosocial" name="discapacidad[]" value="Psicosocial o Mental" {{ in_array('Psicosocial o Mental', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="discapacidad_psicosocial">Psicosocial o Mental</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="discapacidad_ninguna" name="discapacidad[]" value="Ninguna de las anteriores" {{ in_array('Ninguna de las anteriores', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="discapacidad_ninguna">Ninguna de las anteriores</label>
+                        </div>
                 </div>
             </div>
         </div>
