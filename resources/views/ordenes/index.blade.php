@@ -115,7 +115,7 @@
                         <td><strong>{{ $orden->proveedor ?? 'No especificado' }}</strong></td>
                         <td><small class="text-muted">{{ Str::limit($orden->observaciones, 60) ?? '—' }}</small></td>
                         <td class="text-center">
-                            <a href="{{ route('ordenes.show', ['tipo' => 'entrada', 'orden' => $orden]) }}" class="btn btn-sm btn-outline-info" title="Ver detalles">
+                            <a href="{{ route('ordenes.show', ['tipo' => 'entrada', 'id' => $orden->id]) }}" class="btn btn-sm btn-outline-info" title="Ver detalles">
                                 <i class="fas fa-eye"></i>
                             </a>
                         </td>
@@ -156,7 +156,7 @@
                         <td><strong>{{ $orden->beneficiario->nombre ?? 'No especificado' }}</strong></td>
                         <td><small class="text-muted">{{ Str::limit($orden->observaciones, 60) ?? '—' }}</small></td>
                         <td class="text-center">
-                            <a href="{{ route('ordenes.show', ['tipo' => 'entrega', 'orden' => $orden]) }}" class="btn btn-sm btn-outline-info" title="Ver detalles">
+                            <a href="{{ route('ordenes.show', ['tipo' => 'entrega', 'id' => $orden->id]) }}" class="btn btn-sm btn-outline-info" title="Ver detalles">
                                 <i class="fas fa-eye"></i>
                             </a>
                         </td>
