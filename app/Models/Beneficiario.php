@@ -149,4 +149,10 @@ class Beneficiario extends Model
         return $query->where('nombre', 'like', "%{$termino}%")
                     ->orWhere('cedula', 'like', "%{$termino}%");
     }
+
+    // Relación con órdenes de entrega
+    public function ordenEntregas()
+    {
+        return $this->hasMany(\App\Models\OrdenEntrega::class);
+    }
 }

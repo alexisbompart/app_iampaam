@@ -31,6 +31,35 @@
     .btn-actions {
         white-space: nowrap;
     }
+    .btn-productos-otorgados {
+        background: linear-gradient(135deg, #1976d2, #42a5f5);
+        border: none;
+        color: white;
+    }
+    .btn-productos-otorgados:hover {
+        background: linear-gradient(135deg, #1565c0, #1976d2);
+        color: white;
+    }
+    #modalProductosTabla th {
+        background-color: #2e7d32;
+        color: white;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+    .modal-header-custom {
+        background: linear-gradient(135deg, #2e7d32, #4caf50);
+        color: white;
+        border-radius: 0;
+    }
+    .modal-header-custom .btn-close {
+        filter: invert(1);
+    }
+    .badge-cantidad {
+        background-color: #1976d2;
+        font-size: 0.85rem;
+        padding: 0.3rem 0.6rem;
+    }
     .search-container {
         background: white;
         border-radius: 12px;
@@ -180,7 +209,32 @@
                         @endif
                     </td>
                     <td class="text-center btn-actions">
+                        @php
+                            $entregas = $beneficiario->ordenEntregas->flatMap(function($orden) {
+                                return $orden->items->map(function($item) use ($orden) {
+                                    return [
+                                        'orden_id' => $orden->id,
+                                        'fecha'    => $orden->fecha
+                                                        ? \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y')
+                                                        : $orden->created_at->format('d/m/Y'),
+                                        'producto' => $item->producto ? $item->producto->nombre : 'Producto eliminado',
+                                        'cantidad' => $item->cantidad,
+                                        'lote'     => $item->lote ?? '—',
+                                    ];
+                                });
+                            })->values()->toArray();
+                        @endphp
                         <div class="btn-group" role="group">
+                            <button type="button"
+                                class="btn btn-sm btn-productos-otorgados"
+                                title="Productos otorgados"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalProductos"
+                                data-nombre="{{ $beneficiario->nombre }}"
+                                data-cedula="{{ $beneficiario->cedula ?? 'S/N' }}"
+                                data-productos='@json($entregas)'>
+                                <i class="fas fa-gift"></i>
+                            </button>
                             <a href="{{ route('beneficiarios.show', $beneficiario) }}" class="btn btn-sm btn-outline-info" title="Ver detalles">
                                 <i class="fas fa-eye"></i>
                             </a>
@@ -220,4 +274,101 @@
     </div>
     @endif
 </div>
+
+<!-- Modal: Productos Otorgados -->
+<div class="modal fade" id="modalProductos" tabindex="-1" aria-labelledby="modalProductosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header modal-header-custom">
+                <div>
+                    <h5 class="modal-title mb-0" id="modalProductosLabel">
+                        <i class="fas fa-gift me-2"></i>Productos Otorgados
+                    </h5>
+                    <small id="modalSubtitulo" class="opacity-75"></small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Sin entregas -->
+                <div id="modalSinEntregas" class="text-center py-5 d-none">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <h6 class="text-muted">Este beneficiario no tiene productos otorgados</h6>
+                </div>
+                <!-- Tabla de productos -->
+                <div id="modalConEntregas">
+                    <div class="px-3 pt-3 pb-1">
+                        <span class="badge bg-success me-1" id="modalTotalOrdenes"></span>
+                        <span class="badge bg-primary" id="modalTotalProductos"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="modalProductosTabla">
+                            <thead>
+                                <tr>
+                                    <th style="width:110px;">Fecha</th>
+                                    <th>Producto</th>
+                                    <th style="width:90px;" class="text-center">Cantidad</th>
+                                    <th style="width:120px;">Lote</th>
+                                    <th style="width:80px;" class="text-center">Orden</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalProductosTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('modalProductos').addEventListener('show.bs.modal', function (e) {
+    const btn       = e.relatedTarget;
+    const nombre    = btn.dataset.nombre;
+    const cedula    = btn.dataset.cedula;
+    const productos = JSON.parse(btn.dataset.productos || '[]');
+
+    document.getElementById('modalProductosLabel').innerHTML =
+        '<i class="fas fa-gift me-2"></i>Productos Otorgados';
+    document.getElementById('modalSubtitulo').textContent =
+        nombre + ' — C.I.: ' + cedula;
+
+    const sinEntregas   = document.getElementById('modalSinEntregas');
+    const conEntregas   = document.getElementById('modalConEntregas');
+    const tbody         = document.getElementById('modalProductosTbody');
+    const badgeOrdenes  = document.getElementById('modalTotalOrdenes');
+    const badgeProductos= document.getElementById('modalTotalProductos');
+
+    tbody.innerHTML = '';
+
+    if (productos.length === 0) {
+        sinEntregas.classList.remove('d-none');
+        conEntregas.classList.add('d-none');
+        return;
+    }
+
+    sinEntregas.classList.add('d-none');
+    conEntregas.classList.remove('d-none');
+
+    const ordenesUnicas = new Set(productos.map(p => p.orden_id)).size;
+    badgeOrdenes.textContent  = ordenesUnicas + ' orden(es) de entrega';
+    badgeProductos.textContent = productos.length + ' ítem(s) en total';
+
+    productos.forEach(function(p) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><small>${p.fecha}</small></td>
+            <td><strong>${p.producto}</strong></td>
+            <td class="text-center"><span class="badge badge-cantidad">${p.cantidad}</span></td>
+            <td><small class="text-muted">${p.lote}</small></td>
+            <td class="text-center"><small class="badge bg-secondary">#${p.orden_id}</small></td>
+        `;
+        tbody.appendChild(tr);
+    });
+});
+</script>
 @endsection

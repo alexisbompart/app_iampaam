@@ -29,7 +29,7 @@ class BeneficiariosController extends Controller
         }
 
         // Ordenar por fecha de creación descendente
-        $beneficiarios = $query->orderBy('created_at', 'desc')->paginate(15);
+        $beneficiarios = $query->with('ordenEntregas.items.producto')->orderBy('created_at', 'desc')->paginate(15);
 
         return view('beneficiarios.index', compact('beneficiarios'));
     }
