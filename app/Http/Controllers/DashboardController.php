@@ -29,7 +29,9 @@ class DashboardController extends Controller
             $otro = $generos->get('otro', 0);
 
             // Estadísticas adicionales para análisis
-            $productosBajoStock = Producto::where('stock', '<=', 10)->count();
+            $productosAgotados = Producto::where('stock', '<=', 0)->count();
+            $productosBajoStock = Producto::where('stock', '>', 0)->where('stock', '<=', 10)->count();
+            $productosDisponibles = Producto::where('stock', '>', 10)->count();
             $ordenesRecientes = OrdenEntrega::where('created_at', '>=', now()->subDays(30))->count();
 
             // Calcular adultos mayores usando comparación de fechas para aprovechar índices.
@@ -43,7 +45,9 @@ class DashboardController extends Controller
                 'masculino' => $masculino,
                 'femenino' => $femenino,
                 'otro' => $otro,
+                'productosAgotados' => $productosAgotados,
                 'productosBajoStock' => $productosBajoStock,
+                'productosDisponibles' => $productosDisponibles,
                 'ordenesRecientes' => $ordenesRecientes,
                 'beneficiariosMayores' => $beneficiariosMayores,
             ];

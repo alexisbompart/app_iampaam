@@ -62,9 +62,9 @@
                         <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento * <small class="text-muted">(Solo mayores de 60 años)</small></label>
                         <input type="date" class="form-control @error('fecha_nacimiento') is-invalid @enderror" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $beneficiario->fecha_nacimiento ? $beneficiario->fecha_nacimiento->format('Y-m-d') : '') }}" max="{{ now()->subYears(60)->format('Y-m-d') }}" required onchange="calcularEdad(this.value)">
                         @error('fecha_nacimiento') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        <div id="edad_calculada" class="form-text text-success fw-bold">
+                        <div id="edad_calculada" class="form-text fw-bold {{ $beneficiario->edad && $beneficiario->edad >= 60 ? 'text-success' : 'text-danger' }}">
                             @if($beneficiario->fecha_nacimiento)
-                                ✓ Edad: {{ $beneficiario->edad }} años
+                                {{ $beneficiario->edad >= 60 ? '✓' : '⚠' }} Edad: {{ $beneficiario->edad }} años
                             @endif
                         </div>
                     </div>
@@ -259,14 +259,9 @@
                         <label for="tipo_sangre" class="form-label">Tipo de Sangre</label>
                         <select class="form-control @error('tipo_sangre') is-invalid @enderror" id="tipo_sangre" name="tipo_sangre">
                             <option value="">Seleccionar...</option>
-                            <option value="A+" {{ old('tipo_sangre', $beneficiario->tipo_sangre) == 'A+' ? 'selected' : '' }}>A+</option>
-                            <option value="A-" {{ old('tipo_sangre', $beneficiario->tipo_sangre) == 'A-' ? 'selected' : '' }}>A-</option>
-                            <option value="B+" {{ old('tipo_sangre', $beneficiario->tipo_sangre) == 'B+' ? 'selected' : '' }}>B+</option>
-                            <option value="B-" {{ old('tipo_sangre', $beneficiario->tipo_sangre) == 'B-' ? 'selected' : '' }}>B-</option>
-                            <option value="AB+" {{ old('tipo_sangre', $beneficiario->tipo_sangre) == 'AB+' ? 'selected' : '' }}>AB+</option>
-                            <option value="AB-" {{ old('tipo_sangre', $beneficiario->tipo_sangre) == 'AB-' ? 'selected' : '' }}>AB-</option>
-                            <option value="O+" {{ old('tipo_sangre', $beneficiario->tipo_sangre) == 'O+' ? 'selected' : '' }}>O+</option>
-                            <option value="O-" {{ old('tipo_sangre', $beneficiario->tipo_sangre) == 'O-' ? 'selected' : '' }}>O-</option>
+                            @foreach(['A+','A-','B+','B-','AB+','AB-','O+','O-'] as $tipo)
+                                <option value="{{ $tipo }}" {{ old('tipo_sangre', $beneficiario->tipo_sangre) == $tipo ? 'selected' : '' }}>{{ $tipo }}</option>
+                            @endforeach
                         </select>
                         @error('tipo_sangre') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
@@ -284,7 +279,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="enfermedades_cronicas" class="form-label">Enfermedades Crónicas</label>
+                    <label for="enfermedades_cronicas" class="form-label">Enfermedades que Padece</label>
                     <textarea class="form-control @error('enfermedades_cronicas') is-invalid @enderror" id="enfermedades_cronicas" name="enfermedades_cronicas" rows="2" placeholder="Diabetes, hipertensión, etc.">{{ old('enfermedades_cronicas', $beneficiario->enfermedades_cronicas) }}</textarea>
                     @error('enfermedades_cronicas') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
@@ -310,8 +305,8 @@
                 </h3>
 
                 <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="nivel_educativo" class="form-label">Nivel Educativo</label>
+                    <div class="col-md-4">
+                        <label for="nivel_educativo" class="form-label">Grado de Instrucción</label>
                         <select class="form-control @error('nivel_educativo') is-invalid @enderror" id="nivel_educativo" name="nivel_educativo">
                             <option value="">Seleccionar...</option>
                             <option value="ninguno" {{ old('nivel_educativo', $beneficiario->nivel_educativo) == 'ninguno' ? 'selected' : '' }}>Ninguno</option>
@@ -323,15 +318,12 @@
                         </select>
                         @error('nivel_educativo') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="ocupacion_anterior" class="form-label">Ocupación Anterior</label>
                         <input type="text" class="form-control @error('ocupacion_anterior') is-invalid @enderror" id="ocupacion_anterior" name="ocupacion_anterior" value="{{ old('ocupacion_anterior', $beneficiario->ocupacion_anterior) }}">
                         @error('ocupacion_anterior') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="profesion" class="form-label">Profesión</label>
                         <input type="text" class="form-control @error('profesion') is-invalid @enderror" id="profesion" name="profesion" value="{{ old('profesion', $beneficiario->profesion) }}" placeholder="Profesión u oficio">
                         @error('profesion') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -353,88 +345,26 @@
                 <div class="mb-3">
                     <label class="form-label">Fuentes de Ingresos</label>
                     <div class="checkbox-grid">
+                        @php $ingresosActuales = old('ingresos', $beneficiario->ingresos ?? []); @endphp
+                        @foreach(['Ayuda de la familia','Becas','Bonos de la patria','Emprendimiento','Jubilacion','Misiones','Pension amor mayor','Pension ivss','Remesa','Renta','Trabajo asalariado','Ninguno'] as $ingreso)
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ingreso_familia" name="ingresos[]" value="Ayuda de la familia" {{ in_array('Ayuda de la familia', old('ingresos', $beneficiario->ingresos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ingreso_familia">Ayuda de la familia</label>
+                            <input class="form-check-input" type="checkbox" id="ingreso_{{ Str::slug($ingreso) }}" name="ingresos[]" value="{{ $ingreso }}" {{ in_array($ingreso, $ingresosActuales) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="ingreso_{{ Str::slug($ingreso) }}">{{ $ingreso }}</label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ingreso_becas" name="ingresos[]" value="Becas" {{ in_array('Becas', old('ingresos', $beneficiario->ingresos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ingreso_becas">Becas</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ingreso_bonos" name="ingresos[]" value="Bonos de la patria" {{ in_array('Bonos de la patria', old('ingresos', $beneficiario->ingresos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ingreso_bonos">Bonos de la patria</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ingreso_emprendimiento" name="ingresos[]" value="Emprendimiento" {{ in_array('Emprendimiento', old('ingresos', $beneficiario->ingresos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ingreso_emprendimiento">Emprendimiento</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ingreso_jubilacion" name="ingresos[]" value="Jubilacion" {{ in_array('Jubilacion', old('ingresos', $beneficiario->ingresos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ingreso_jubilacion">Jubilación</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ingreso_misiones" name="ingresos[]" value="Misiones" {{ in_array('Misiones', old('ingresos', $beneficiario->ingresos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ingreso_misiones">Misiones</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ingreso_pension_amormayor" name="ingresos[]" value="Pension amor mayor" {{ in_array('Pension amor mayor', old('ingresos', $beneficiario->ingresos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ingreso_pension_amormayor">Pensión amor mayor</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ingreso_pension_ivss" name="ingresos[]" value="Pension ivss" {{ in_array('Pension ivss', old('ingresos', $beneficiario->ingresos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ingreso_pension_ivss">Pensión IVSS</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ingreso_remesa" name="ingresos[]" value="Remesa" {{ in_array('Remesa', old('ingresos', $beneficiario->ingresos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ingreso_remesa">Remesa</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ingreso_renta" name="ingresos[]" value="Renta" {{ in_array('Renta', old('ingresos', $beneficiario->ingresos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ingreso_renta">Renta</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ingreso_trabajo" name="ingresos[]" value="Trabajo asalariado" {{ in_array('Trabajo asalariado', old('ingresos', $beneficiario->ingresos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ingreso_trabajo">Trabajo asalariado</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="ingreso_ninguno" name="ingresos[]" value="Ninguno" {{ in_array('Ninguno', old('ingresos', $beneficiario->ingresos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ingreso_ninguno">Ninguno</label>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Gastos Principales</label>
                     <div class="checkbox-grid">
+                        @php $gastosActuales = old('gastos', $beneficiario->gastos ?? []); @endphp
+                        @foreach(['Alimentacion','Entretenimiento','Medicina','Servicios basicos','Transporte','Vivienda','Otro'] as $gasto)
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_alimentacion" name="gastos[]" value="Alimentacion" {{ in_array('Alimentacion', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_alimentacion">Alimentación</label>
+                            <input class="form-check-input" type="checkbox" id="gasto_{{ Str::slug($gasto) }}" name="gastos[]" value="{{ $gasto }}" {{ in_array($gasto, $gastosActuales) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="gasto_{{ Str::slug($gasto) }}">{{ $gasto }}</label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_entretenimiento" name="gastos[]" value="Entretenimiento" {{ in_array('Entretenimiento', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_entretenimiento">Entretenimiento</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_medicina" name="gastos[]" value="Medicina" {{ in_array('Medicina', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_medicina">Medicina</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_servicios" name="gastos[]" value="Servicios basicos" {{ in_array('Servicios basicos', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_servicios">Servicios básicos</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_transporte" name="gastos[]" value="Transporte" {{ in_array('Transporte', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_transporte">Transporte</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_vivienda" name="gastos[]" value="Vivienda" {{ in_array('Vivienda', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_vivienda">Vivienda</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_otro" name="gastos[]" value="Otro" {{ in_array('Otro', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_otro">Otro</label>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -495,30 +425,13 @@
                 <div class="mb-3">
                     <label class="form-label">Servicios Disponibles</label>
                     <div class="checkbox-grid">
+                        @php $serviciosActuales = old('servicios', $beneficiario->servicios ?? []); @endphp
+                        @foreach(['Agua potable','Electricidad','Gas','Teléfono','Internet','Cable TV'] as $servicio)
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="servicio_agua" name="servicios[]" value="Agua potable" {{ in_array('Agua potable', old('servicios', $beneficiario->servicios ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="servicio_agua">Agua potable</label>
+                            <input class="form-check-input" type="checkbox" id="servicio_{{ Str::slug($servicio) }}" name="servicios[]" value="{{ $servicio }}" {{ in_array($servicio, $serviciosActuales) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="servicio_{{ Str::slug($servicio) }}">{{ $servicio }}</label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="servicio_electricidad" name="servicios[]" value="Electricidad" {{ in_array('Electricidad', old('servicios', $beneficiario->servicios ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="servicio_electricidad">Electricidad</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="servicio_gas" name="servicios[]" value="Gas" {{ in_array('Gas', old('servicios', $beneficiario->servicios ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="servicio_gas">Gas</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="servicio_telefono" name="servicios[]" value="Teléfono" {{ in_array('Teléfono', old('servicios', $beneficiario->servicios ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="servicio_telefono">Teléfono</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="servicio_internet" name="servicios[]" value="Internet" {{ in_array('Internet', old('servicios', $beneficiario->servicios ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="servicio_internet">Internet</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="servicio_cable" name="servicios[]" value="Cable TV" {{ in_array('Cable TV', old('servicios', $beneficiario->servicios ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="servicio_cable">Cable TV</label>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -544,30 +457,13 @@
                 <div class="mb-3">
                     <label class="form-label">Tipo de Discapacidad</label>
                     <div class="checkbox-grid">
+                        @php $discapacidadActual = old('discapacidad', $beneficiario->discapacidad ?? []); @endphp
+                        @foreach(['Física o Motora','Sensorial-Visual','Sensorial-Auditiva','Intelectual o Cognitiva','Psicosocial o Mental','Ninguna de las anteriores'] as $disc)
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="discapacidad_fisica" name="discapacidad[]" value="Física o Motora" {{ in_array('Física o Motora', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="discapacidad_fisica">Física o Motora</label>
+                            <input class="form-check-input" type="checkbox" id="disc_{{ Str::slug($disc) }}" name="discapacidad[]" value="{{ $disc }}" {{ in_array($disc, $discapacidadActual) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="disc_{{ Str::slug($disc) }}">{{ $disc }}</label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="discapacidad_visual" name="discapacidad[]" value="Sensorial-Visual" {{ in_array('Sensorial-Visual', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="discapacidad_visual">Sensorial-Visual</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="discapacidad_auditiva" name="discapacidad[]" value="Sensorial-Auditiva" {{ in_array('Sensorial-Auditiva', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="discapacidad_auditiva">Sensorial-Auditiva</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="discapacidad_intelectual" name="discapacidad[]" value="Intelectual o Cognitiva" {{ in_array('Intelectual o Cognitiva', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="discapacidad_intelectual">Intelectual o Cognitiva</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="discapacidad_psicosocial" name="discapacidad[]" value="Psicosocial o Mental" {{ in_array('Psicosocial o Mental', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="discapacidad_psicosocial">Psicosocial o Mental</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="discapacidad_ninguna" name="discapacidad[]" value="Ninguna de las anteriores" {{ in_array('Ninguna de las anteriores', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="discapacidad_ninguna">Ninguna de las anteriores</label>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
 
@@ -578,7 +474,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="necesidades_especiales" class="form-label">Otras Necesidades Especialmente</label>
+                    <label for="necesidades_especiales" class="form-label">Otras Necesidades Especiales</label>
                     <textarea class="form-control @error('necesidades_especiales') is-invalid @enderror" id="necesidades_especiales" name="necesidades_especiales" rows="2" placeholder="Cuidados especiales, dieta específica, etc.">{{ old('necesidades_especiales', $beneficiario->necesidades_especiales) }}</textarea>
                     @error('necesidades_especiales') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
@@ -617,10 +513,29 @@
                 </div>
             </div>
 
-            <!-- 9. INFORMACIÓN ADICIONAL -->
+            <!-- 9. ACTIVIDADES DE INTERÉS -->
             <div class="form-section">
                 <h3 class="section-title">
-                    <i class="fas fa-info-circle me-2"></i>9. Información Adicional
+                    <i class="fas fa-star me-2"></i>9. Actividades de Interés
+                </h3>
+
+                <div class="mb-3">
+                    <label for="actividades_formativas" class="form-label">Actividades Formativas de Interés</label>
+                    <textarea class="form-control @error('actividades_formativas') is-invalid @enderror" id="actividades_formativas" name="actividades_formativas" rows="3" placeholder="Talleres, cursos, capacitaciones, charlas, etc.">{{ old('actividades_formativas', $beneficiario->actividades_formativas) }}</textarea>
+                    @error('actividades_formativas') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="actividades_recreativas" class="form-label">Actividades Recreativas de Interés</label>
+                    <textarea class="form-control @error('actividades_recreativas') is-invalid @enderror" id="actividades_recreativas" name="actividades_recreativas" rows="3" placeholder="Deportes, manualidades, música, danza, paseos, etc.">{{ old('actividades_recreativas', $beneficiario->actividades_recreativas) }}</textarea>
+                    @error('actividades_recreativas') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+            </div>
+
+            <!-- 10. INFORMACIÓN ADICIONAL -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-info-circle me-2"></i>10. Información Adicional
                 </h3>
 
                 <div class="mb-3">
@@ -650,190 +565,19 @@
             <!-- Botones de acción -->
             <div class="form-section">
                 <div class="text-center">
-                    <button type="submit" class="btn btn-success btn-lg px-5">
+                    <button type="submit" class="btn btn-warning btn-lg px-5">
                         <i class="fas fa-save me-2"></i>Actualizar Beneficiario
                     </button>
-                    <a href="{{ route('beneficiarios.index') }}" class="btn btn-secondary btn-lg px-5 ms-3">
+                    <a href="{{ route('beneficiarios.show', $beneficiario) }}" class="btn btn-outline-info btn-lg px-4 ms-2">
+                        <i class="fas fa-eye me-2"></i>Ver Perfil
+                    </a>
+                    <a href="{{ route('beneficiarios.index') }}" class="btn btn-secondary btn-lg px-4 ms-2">
                         <i class="fas fa-times me-2"></i>Cancelar
                     </a>
                 </div>
             </div>
         </form>
     </div>
-</div>
-@endsection
-            <label class="form-label">¿Recibe algún tipo de ayuda económica?</label><br>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" id="ayuda_si" name="ayuda_economica" value="si" {{ old('ayuda_economica') == 'si' ? 'checked' : '' }}>
-                <label class="form-check-label" for="ayuda_si">Sí</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" id="ayuda_no" name="ayuda_economica" value="no" {{ old('ayuda_economica') == 'no' ? 'checked' : '' }}>
-                <label class="form-check-label" for="ayuda_no">No</label>
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Fuentes de Ingresos</label><br>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ingreso_familia" name="ingresos[]" value="Ayuda de la familia" {{ in_array('Ayuda de la familia', old('ingresos', json_decode($beneficiario->ingresos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="ingreso_familia">Ayuda de la familia</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ingreso_becas" name="ingresos[]" value="Becas" {{ in_array('Becas', old('ingresos', json_decode($beneficiario->ingresos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="ingreso_becas">Becas</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ingreso_bonos" name="ingresos[]" value="Bonos de la patria" {{ in_array('Bonos de la patria', old('ingresos', json_decode($beneficiario->ingresos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="ingreso_bonos">Bonos de la patria</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ingreso_emprendimiento" name="ingresos[]" value="Emprendimiento" {{ in_array('Emprendimiento', old('ingresos', json_decode($beneficiario->ingresos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="ingreso_emprendimiento">Emprendimiento</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ingreso_jubilacion" name="ingresos[]" value="Jubilacion" {{ in_array('Jubilacion', old('ingresos', json_decode($beneficiario->ingresos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="ingreso_jubilacion">Jubilación</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ingreso_misiones" name="ingresos[]" value="Misiones" {{ in_array('Misiones', old('ingresos', json_decode($beneficiario->ingresos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="ingreso_misiones">Misiones</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ingreso_pension_amormayor" name="ingresos[]" value="Pension amor mayor" {{ in_array('Pension amor mayor', old('ingresos', json_decode($beneficiario->ingresos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="ingreso_pension_amormayor">Pensión amor mayor</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ingreso_pension_ivss" name="ingresos[]" value="Pension ivss" {{ in_array('Pension ivss', old('ingresos', json_decode($beneficiario->ingresos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="ingreso_pension_ivss">Pensión IVSS</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ingreso_remesa" name="ingresos[]" value="Remesa" {{ in_array('Remesa', old('ingresos', json_decode($beneficiario->ingresos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="ingreso_remesa">Remesa</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ingreso_renta" name="ingresos[]" value="Renta" {{ in_array('Renta', old('ingresos', json_decode($beneficiario->ingresos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="ingreso_renta">Renta</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ingreso_trabajo" name="ingresos[]" value="Trabajo asalariado" {{ in_array('Trabajo asalariado', old('ingresos', json_decode($beneficiario->ingresos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="ingreso_trabajo">Trabajo asalariado</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ingreso_ninguno" name="ingresos[]" value="Ninguno" {{ in_array('Ninguno', old('ingresos', json_decode($beneficiario->ingresos, true) ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="ingreso_ninguno">Ninguno</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Gastos Principales</label><br>
-            <div class="row">
-                <div class="col-md-6">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_alimentacion" name="gastos[]" value="Alimentacion" {{ in_array('Alimentacion', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_alimentacion">Alimentación</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_entretenimiento" name="gastos[]" value="Entretenimiento" {{ in_array('Entretenimiento', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_entretenimiento">Entretenimiento</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_medicina" name="gastos[]" value="Medicina" {{ in_array('Medicina', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_medicina">Medicina</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_servicios" name="gastos[]" value="Servicios basicos" {{ in_array('Servicios basicos', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_servicios">Servicios básicos</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_transporte" name="gastos[]" value="Transporte" {{ in_array('Transporte', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_transporte">Transporte</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_vivienda" name="gastos[]" value="Vivienda" {{ in_array('Vivienda', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_vivienda">Vivienda</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gasto_otro" name="gastos[]" value="Otro" {{ in_array('Otro', old('gastos', $beneficiario->gastos ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="gasto_otro">Otro</label>
-                        </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Discapacidad</label><br>
-            <div class="row">
-                <div class="col-md-6">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="discapacidad_fisica" name="discapacidad[]" value="Física o Motora" {{ in_array('Física o Motora', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="discapacidad_fisica">Física o Motora</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="discapacidad_visual" name="discapacidad[]" value="Sensorial-Visual" {{ in_array('Sensorial-Visual', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="discapacidad_visual">Sensorial-Visual</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="discapacidad_auditiva" name="discapacidad[]" value="Sensorial-Auditiva" {{ in_array('Sensorial-Auditiva', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="discapacidad_auditiva">Sensorial-Auditiva</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="discapacidad_intelectual" name="discapacidad[]" value="Intelectual o Cognitiva" {{ in_array('Intelectual o Cognitiva', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="discapacidad_intelectual">Intelectual o Cognitiva</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="discapacidad_psicosocial" name="discapacidad[]" value="Psicosocial o Mental" {{ in_array('Psicosocial o Mental', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="discapacidad_psicosocial">Psicosocial o Mental</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="discapacidad_ninguna" name="discapacidad[]" value="Ninguna de las anteriores" {{ in_array('Ninguna de las anteriores', old('discapacidad', $beneficiario->discapacidad ?? [])) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="discapacidad_ninguna">Ninguna de las anteriores</label>
-                        </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ACTIVIDADES DE INTERÉS -->
-        <div class="form-section">
-            <h3 class="section-title">
-                <i class="fas fa-star me-2"></i>Actividades de Interés
-            </h3>
-
-            <div class="mb-3">
-                <label for="actividades_formativas" class="form-label">Actividades Formativas de Interés</label>
-                <textarea class="form-control @error('actividades_formativas') is-invalid @enderror" id="actividades_formativas" name="actividades_formativas" rows="3" placeholder="Talleres, cursos, capacitaciones, charlas, etc.">{{ old('actividades_formativas', $beneficiario->actividades_formativas) }}</textarea>
-                @error('actividades_formativas') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="mb-3">
-                <label for="actividades_recreativas" class="form-label">Actividades Recreativas de Interés</label>
-                <textarea class="form-control @error('actividades_recreativas') is-invalid @enderror" id="actividades_recreativas" name="actividades_recreativas" rows="3" placeholder="Deportes, manualidades, música, danza, paseos, etc.">{{ old('actividades_recreativas', $beneficiario->actividades_recreativas) }}</textarea>
-                @error('actividades_recreativas') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-        </div>
-
-        <div class="text-center mt-3">
-            <div class="btn-group" role="group">
-                <button type="submit" class="btn btn-warning btn-lg">
-                    <i class="fas fa-save me-2"></i>Actualizar Beneficiario
-                </button>
-                <a href="{{ route('beneficiarios.show', $beneficiario) }}" class="btn btn-outline-info btn-lg">
-                    <i class="fas fa-eye me-2"></i>Ver Beneficiario
-                </a>
-                <a href="{{ route('beneficiarios.index') }}" class="btn btn-secondary btn-lg">
-                    <i class="fas fa-arrow-left me-2"></i>Volver
-                </a>
-            </div>
-        </div>
-    </form>
 </div>
 
 <script>
