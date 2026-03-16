@@ -58,9 +58,10 @@
 
                 <div class="row mb-3">
                     <div class="col-md-4">
-                        <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
-                        <input type="date" class="form-control @error('fecha_nacimiento') is-invalid @enderror" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}" required>
+                        <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento * <small class="text-muted">(Solo mayores de 60 años)</small></label>
+                        <input type="date" class="form-control @error('fecha_nacimiento') is-invalid @enderror" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}" max="{{ now()->subYears(60)->format('Y-m-d') }}" required onchange="calcularEdad(this.value)">
                         @error('fecha_nacimiento') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        <div id="edad_calculada" class="form-text text-success fw-bold"></div>
                     </div>
                     <div class="col-md-4">
                         <label for="lugar_nacimiento" class="form-label">Lugar de Nacimiento</label>
@@ -209,6 +210,32 @@
                         @error('sector') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-md-6">
+                        <label for="comunidad" class="form-label">Comunidad</label>
+                        <input type="text" class="form-control @error('comunidad') is-invalid @enderror" id="comunidad" name="comunidad" value="{{ old('comunidad') }}">
+                        @error('comunidad') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="comuna" class="form-label">Comuna</label>
+                        <input type="text" class="form-control @error('comuna') is-invalid @enderror" id="comuna" name="comuna" value="{{ old('comuna') }}">
+                        @error('comuna') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="col-md-4">
+                        <label for="consejo_comunal" class="form-label">Consejo Comunal</label>
+                        <input type="text" class="form-control @error('consejo_comunal') is-invalid @enderror" id="consejo_comunal" name="consejo_comunal" value="{{ old('consejo_comunal') }}">
+                        @error('consejo_comunal') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="col-md-4">
+                        <label for="centro_electoral" class="form-label">Centro Electoral</label>
+                        <input type="text" class="form-control @error('centro_electoral') is-invalid @enderror" id="centro_electoral" name="centro_electoral" value="{{ old('centro_electoral') }}">
+                        @error('centro_electoral') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
                         <label for="punto_referencia" class="form-label">Punto de Referencia</label>
                         <input type="text" class="form-control @error('punto_referencia') is-invalid @enderror" id="punto_referencia" name="punto_referencia" value="{{ old('punto_referencia') }}">
                         @error('punto_referencia') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -295,6 +322,14 @@
                         <label for="ocupacion_anterior" class="form-label">Ocupación Anterior</label>
                         <input type="text" class="form-control @error('ocupacion_anterior') is-invalid @enderror" id="ocupacion_anterior" name="ocupacion_anterior" value="{{ old('ocupacion_anterior') }}">
                         @error('ocupacion_anterior') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="profesion" class="form-label">Profesión</label>
+                        <input type="text" class="form-control @error('profesion') is-invalid @enderror" id="profesion" name="profesion" value="{{ old('profesion') }}" placeholder="Profesión u oficio">
+                        @error('profesion') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                 </div>
 
@@ -577,10 +612,29 @@
                 </div>
             </div>
 
-            <!-- 9. INFORMACIÓN ADICIONAL -->
+            <!-- 9. ACTIVIDADES DE INTERÉS -->
             <div class="form-section">
                 <h3 class="section-title">
-                    <i class="fas fa-info-circle me-2"></i>9. Información Adicional
+                    <i class="fas fa-star me-2"></i>9. Actividades de Interés
+                </h3>
+
+                <div class="mb-3">
+                    <label for="actividades_formativas" class="form-label">Actividades Formativas de Interés</label>
+                    <textarea class="form-control @error('actividades_formativas') is-invalid @enderror" id="actividades_formativas" name="actividades_formativas" rows="3" placeholder="Talleres, cursos, capacitaciones, charlas, etc.">{{ old('actividades_formativas') }}</textarea>
+                    @error('actividades_formativas') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="actividades_recreativas" class="form-label">Actividades Recreativas de Interés</label>
+                    <textarea class="form-control @error('actividades_recreativas') is-invalid @enderror" id="actividades_recreativas" name="actividades_recreativas" rows="3" placeholder="Deportes, manualidades, música, danza, paseos, etc.">{{ old('actividades_recreativas') }}</textarea>
+                    @error('actividades_recreativas') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+            </div>
+
+            <!-- 10. INFORMACIÓN ADICIONAL -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-info-circle me-2"></i>10. Información Adicional
                 </h3>
 
                 <div class="mb-3">
@@ -621,4 +675,23 @@
         </form>
     </div>
 </div>
+
+<script>
+function calcularEdad(fechaNacimiento) {
+    const div = document.getElementById('edad_calculada');
+    if (!fechaNacimiento) { div.textContent = ''; return; }
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
+    if (edad < 60) {
+        div.className = 'form-text text-danger fw-bold';
+        div.textContent = `⚠ Edad calculada: ${edad} años. Solo se admiten personas de 60 años o más.`;
+    } else {
+        div.className = 'form-text text-success fw-bold';
+        div.textContent = `✓ Edad: ${edad} años`;
+    }
+}
+</script>
 @endsection

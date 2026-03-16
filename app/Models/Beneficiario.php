@@ -35,6 +35,10 @@ class Beneficiario extends Model
         'municipio',
         'parroquia',
         'sector',
+        'comunidad',
+        'comuna',
+        'consejo_comunal',
+        'centro_electoral',
         'punto_referencia',
 
         // Información médica básica
@@ -48,6 +52,7 @@ class Beneficiario extends Model
         // Información socioeconómica detallada
         'nivel_educativo',
         'ocupacion_anterior',
+        'profesion',
         'ayuda_economica',
         'ingresos', // JSON
         'gastos', // JSON
@@ -73,6 +78,8 @@ class Beneficiario extends Model
 
         // Información adicional
         'observaciones',
+        'actividades_formativas',
+        'actividades_recreativas',
         'fecha_ingreso',
         'estado_beneficiario',
     ];

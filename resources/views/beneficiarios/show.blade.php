@@ -255,6 +255,30 @@
                 <div class="info-value">{{ $beneficiario->sector }}</div>
             </div>
             @endif
+            @if($beneficiario->comunidad)
+            <div class="info-item">
+                <div class="info-label">Comunidad</div>
+                <div class="info-value">{{ $beneficiario->comunidad }}</div>
+            </div>
+            @endif
+            @if($beneficiario->comuna)
+            <div class="info-item">
+                <div class="info-label">Comuna</div>
+                <div class="info-value">{{ $beneficiario->comuna }}</div>
+            </div>
+            @endif
+            @if($beneficiario->consejo_comunal)
+            <div class="info-item">
+                <div class="info-label">Consejo Comunal</div>
+                <div class="info-value">{{ $beneficiario->consejo_comunal }}</div>
+            </div>
+            @endif
+            @if($beneficiario->centro_electoral)
+            <div class="info-item">
+                <div class="info-label">Centro Electoral</div>
+                <div class="info-value">{{ $beneficiario->centro_electoral }}</div>
+            </div>
+            @endif
             @if($beneficiario->punto_referencia)
             <div class="info-item">
                 <div class="info-label">Punto de Referencia</div>
@@ -328,6 +352,12 @@
             <div class="info-item">
                 <div class="info-label">Ocupación Anterior</div>
                 <div class="info-value">{{ $beneficiario->ocupacion_anterior }}</div>
+            </div>
+            @endif
+            @if($beneficiario->profesion)
+            <div class="info-item">
+                <div class="info-label">Profesión</div>
+                <div class="info-value">{{ $beneficiario->profesion }}</div>
             </div>
             @endif
             @if($beneficiario->ayuda_economica)
@@ -496,6 +526,29 @@
             <div class="info-item">
                 <div class="info-label">Última Actualización</div>
                 <div class="info-value">{{ $beneficiario->updated_at->format('d/m/Y H:i') }}</div>
+            </div>
+            @endif
+        </div>
+    </div>
+    @endif
+
+    <!-- ACTIVIDADES DE INTERÉS -->
+    @if($beneficiario->actividades_formativas || $beneficiario->actividades_recreativas)
+    <div class="detail-section">
+        <h3 class="section-title">
+            <i class="fas fa-star me-2"></i>Actividades de Interés
+        </h3>
+        <div class="info-grid">
+            @if($beneficiario->actividades_formativas)
+            <div class="info-item">
+                <div class="info-label">Actividades Formativas</div>
+                <div class="info-value">{{ $beneficiario->actividades_formativas }}</div>
+            </div>
+            @endif
+            @if($beneficiario->actividades_recreativas)
+            <div class="info-item">
+                <div class="info-label">Actividades Recreativas</div>
+                <div class="info-value">{{ $beneficiario->actividades_recreativas }}</div>
             </div>
             @endif
         </div>

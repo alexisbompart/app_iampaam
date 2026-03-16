@@ -45,7 +45,7 @@ class BeneficiariosController extends Controller
             // Datos personales
             'nombre' => 'required|string|max:255',
             'cedula' => 'required|string|max:20|unique:beneficiarios,cedula',
-            'fecha_nacimiento' => 'required|date|before:today',
+            'fecha_nacimiento' => 'required|date|before_or_equal:' . now()->subYears(60)->format('Y-m-d'),
             'lugar_nacimiento' => 'nullable|string|max:255',
             'nacionalidad' => 'nullable|string|max:100',
             'estado_civil' => 'required|in:soltero,casado,divorciado,viudo',
@@ -67,6 +67,10 @@ class BeneficiariosController extends Controller
             'municipio' => 'nullable|string|max:100',
             'parroquia' => 'nullable|string|max:100',
             'sector' => 'nullable|string|max:100',
+            'comunidad' => 'nullable|string|max:255',
+            'comuna' => 'nullable|string|max:255',
+            'consejo_comunal' => 'nullable|string|max:255',
+            'centro_electoral' => 'nullable|string|max:255',
             'punto_referencia' => 'nullable|string|max:255',
 
             // Información médica básica
@@ -80,6 +84,7 @@ class BeneficiariosController extends Controller
             // Información socioeconómica detallada
             'nivel_educativo' => 'nullable|in:ninguno,primaria,secundaria,tecnico,universitario,postgrado',
             'ocupacion_anterior' => 'nullable|string|max:255',
+            'profesion' => 'nullable|string|max:255',
             'ayuda_economica' => 'nullable|in:si,no',
             'ingresos' => 'nullable|array',
             'gastos' => 'nullable|array',
@@ -105,6 +110,8 @@ class BeneficiariosController extends Controller
 
             // Información adicional
             'observaciones' => 'nullable|string|max:1000',
+            'actividades_formativas' => 'nullable|string|max:1000',
+            'actividades_recreativas' => 'nullable|string|max:1000',
             'fecha_ingreso' => 'nullable|date',
             'estado_beneficiario' => 'nullable|in:activo,inactivo,suspendido',
         ]);
@@ -135,7 +142,7 @@ class BeneficiariosController extends Controller
             // Datos personales
             'nombre' => 'required|string|max:255',
             'cedula' => 'required|string|max:20|unique:beneficiarios,cedula,' . $beneficiario->id,
-            'fecha_nacimiento' => 'required|date|before:today',
+            'fecha_nacimiento' => 'required|date|before_or_equal:' . now()->subYears(60)->format('Y-m-d'),
             'lugar_nacimiento' => 'nullable|string|max:255',
             'nacionalidad' => 'nullable|string|max:100',
             'estado_civil' => 'required|in:soltero,casado,divorciado,viudo',
@@ -157,6 +164,10 @@ class BeneficiariosController extends Controller
             'municipio' => 'nullable|string|max:100',
             'parroquia' => 'nullable|string|max:100',
             'sector' => 'nullable|string|max:100',
+            'comunidad' => 'nullable|string|max:255',
+            'comuna' => 'nullable|string|max:255',
+            'consejo_comunal' => 'nullable|string|max:255',
+            'centro_electoral' => 'nullable|string|max:255',
             'punto_referencia' => 'nullable|string|max:255',
 
             // Información médica básica
@@ -170,6 +181,7 @@ class BeneficiariosController extends Controller
             // Información socioeconómica detallada
             'nivel_educativo' => 'nullable|in:ninguno,primaria,secundaria,tecnico,universitario,postgrado',
             'ocupacion_anterior' => 'nullable|string|max:255',
+            'profesion' => 'nullable|string|max:255',
             'ayuda_economica' => 'nullable|in:si,no',
             'ingresos' => 'nullable|array',
             'gastos' => 'nullable|array',
@@ -195,6 +207,8 @@ class BeneficiariosController extends Controller
 
             // Información adicional
             'observaciones' => 'nullable|string|max:1000',
+            'actividades_formativas' => 'nullable|string|max:1000',
+            'actividades_recreativas' => 'nullable|string|max:1000',
             'fecha_ingreso' => 'nullable|date',
             'estado_beneficiario' => 'nullable|in:activo,inactivo,suspendido',
         ]);
