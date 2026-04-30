@@ -24,12 +24,12 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Configurar working directory
-WORKDIR /var/www/html/iampaam
+WORKDIR /var/www/html/app_iampaam
 
 # Cambiar ownership
-RUN chown -R www-data:www-data /var/www/html/iampaam \
-    && chmod -R 755 /var/www/html/iampaam/storage \
-    && chmod -R 755 /var/www/html/iampaam/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/app_iampaam \
+    && chmod -R 755 /var/www/html/app_iampaam/storage \
+    && chmod -R 755 /var/www/html/app_iampaam/bootstrap/cache
 
 USER www-data
 

@@ -4,9 +4,9 @@ services:
   app:
     image: php:8.2-fpm
     container_name: laravel_php82
-    working_dir: /var/www/html/iampaam
+    working_dir: /var/www/html/app_iampaam
     volumes:
-      - /var/www/html/iampaam:/var/www/html/iampaam
+      - /var/www/html/app_iampaam:/var/www/html/app_iampaam
     networks:
       - laravel_network
     extra_hosts:
@@ -28,7 +28,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /var/www/html/iampaam:/var/www/html/iampaam
+      - /var/www/html/app_iampaam:/var/www/html/app_iampaam
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
