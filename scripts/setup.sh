@@ -7,7 +7,7 @@ echo "Configurando entorno IAMPAAAM con Docker"
 echo "========================================="
 
 # Variables
-PROJECT_PATH="/var/www/html/iampaam"
+PROJECT_PATH="/var/www/html/app_iampaam"
 DB_NAME="iampaam_db"
 DB_USER="iampaam_user"
 DB_PASS="iampaam_password_$(date +%s | sha256sum | base64 | head -c 16)"
