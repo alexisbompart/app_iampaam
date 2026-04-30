@@ -2,46 +2,36 @@ version: '3.8'
 
 services:
   app:
-    build: .
-    #image:php:8.2-apache  # Usamos imagen oficial con Apache y PHP 8.2
-    container_name: laravel_app
-    restart: unless-stopped
-    ports:
-      - "8080:80"  # Mapeamos el puerto 80 del contenedor al 8080 del host
+    image: php:8.2-fpm
+    container_name: laravel_php82
+    working_dir: /var/www/html
     volumes:
-      - .:/var/www/html  # Montamos el código de Laravel
-      - ./laravel.conf:/etc/apache2/sites-available/000-default.conf
-      - ./php.ini:/usr/local/etc/php/php.ini  # Opcional: configuración personalizada de PHP
+      - ./:/var/www/html
+    networks:
+      - laravel_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Permite acceder al host
     environment:
-      - DB_CONNECTION=pgsql
-      - DB_HOST=db
+      - DB_HOST=host.docker.internal  # << USA ESTO PARA CONECTAR AL HOST
       - DB_PORT=5432
-      - DB_DATABASE=laravel
-      - DB_USERNAME=laravel_user
-      - DB_PASSWORD=secret
-    depends_on:
-      - db
-    networks:
-      - laravel_net
+      - DB_DATABASE=iampaam_db
+      - DB_USERNAME=iampaam_user
+      - DB_PASSWORD=20.Iampaam26
 
-  db:
-    image: postgres:15  # Versión reciente de PostgreSQL
-    container_name: laravel_db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: laravel
-      POSTGRES_USER: laravel_user
-      POSTGRES_PASSWORD: secret
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+  webserver:
+    image: nginx:alpine
+    container_name: nginx_webserver
     ports:
-      - "5432:5432"  # Opcional: exponer PostgreSQL al host (solo si necesitas acceso externo)
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
     networks:
-      - laravel_net
-
-volumes:
-  pgdata:
+      - laravel_network
 
 networks:
-  laravel_net:
+  laravel_network:
     driver: bridge
