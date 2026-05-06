@@ -19,7 +19,8 @@
 
     <style>
         .sidebar {
-            min-height: 100vh;
+            height: 100vh;
+            overflow-y: auto;
             background: linear-gradient(180deg, #f1f8e9 0%, #e8f5e8 100%);
             color: #2e7d32;
             border-right: 2px solid #c8e6c9;
