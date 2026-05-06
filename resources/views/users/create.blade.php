@@ -56,7 +56,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="role" class="form-label">Rol *</label>
-                        <select class="form-control @error('role') is-invalid @enderror" id="role" name="role" required>
+                        <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
                             <option value="">Seleccionar rol...</option>
                             <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrador</option>
                             <option value="operador" {{ old('role') == 'operador' ? 'selected' : '' }}>Operador</option>

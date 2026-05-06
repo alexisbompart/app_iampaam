@@ -252,7 +252,7 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="tipo_sangre" class="form-label">Tipo de Sangre</label>
-                        <select class="form-control @error('tipo_sangre') is-invalid @enderror" id="tipo_sangre" name="tipo_sangre">
+                        <select class="form-select @error('tipo_sangre') is-invalid @enderror" id="tipo_sangre" name="tipo_sangre">
                             <option value="">Seleccionar...</option>
                             <option value="A+" {{ old('tipo_sangre') == 'A+' ? 'selected' : '' }}>A+</option>
                             <option value="A-" {{ old('tipo_sangre') == 'A-' ? 'selected' : '' }}>A-</option>
@@ -307,7 +307,7 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="nivel_educativo" class="form-label">Nivel Educativo</label>
-                        <select class="form-control @error('nivel_educativo') is-invalid @enderror" id="nivel_educativo" name="nivel_educativo">
+                        <select class="form-select @error('nivel_educativo') is-invalid @enderror" id="nivel_educativo" name="nivel_educativo">
                             <option value="">Seleccionar...</option>
                             <option value="ninguno" {{ old('nivel_educativo') == 'ninguno' ? 'selected' : '' }}>Ninguno</option>
                             <option value="primaria" {{ old('nivel_educativo') == 'primaria' ? 'selected' : '' }}>Primaria</option>
@@ -651,7 +651,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="estado_beneficiario" class="form-label">Estado del Beneficiario</label>
-                        <select class="form-control @error('estado_beneficiario') is-invalid @enderror" id="estado_beneficiario" name="estado_beneficiario">
+                        <select class="form-select @error('estado_beneficiario') is-invalid @enderror" id="estado_beneficiario" name="estado_beneficiario">
                             <option value="activo" {{ old('estado_beneficiario', 'activo') == 'activo' ? 'selected' : '' }}>Activo</option>
                             <option value="inactivo" {{ old('estado_beneficiario') == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
                             <option value="suspendido" {{ old('estado_beneficiario') == 'suspendido' ? 'selected' : '' }}>Suspendido</option>

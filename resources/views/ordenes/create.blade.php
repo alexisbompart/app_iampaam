@@ -68,7 +68,7 @@
                     @else
                     <div class="col-md-8">
                         <label for="beneficiario_id" class="form-label">Beneficiario *</label>
-                        <select class="form-control @error('beneficiario_id') is-invalid @enderror" id="beneficiario_id" name="beneficiario_id" required>
+                        <select class="form-select @error('beneficiario_id') is-invalid @enderror" id="beneficiario_id" name="beneficiario_id" required>
                             <option value="">Seleccionar beneficiario...</option>
                             @foreach($beneficiarios as $beneficiario)
                                 <option value="{{ $beneficiario->id }}">{{ $beneficiario->nombre }} — {{ $beneficiario->cedula ?? 'Sin cédula' }}</option>
@@ -97,7 +97,7 @@
                         <div class="row align-items-end">
                             <div class="col-md-4">
                                 <label class="form-label">Producto *</label>
-                                <select class="form-control" name="productos[]" required>
+                                <select class="form-select" name="productos[]" required>
                                     <option value="">Seleccionar producto...</option>
                                     @foreach($productos as $producto)
                                         <option value="{{ $producto->id }}">{{ $producto->nombre }} (Stock: {{ $producto->stock }})</option>

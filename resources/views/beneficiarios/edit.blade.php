@@ -257,7 +257,7 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="tipo_sangre" class="form-label">Tipo de Sangre</label>
-                        <select class="form-control @error('tipo_sangre') is-invalid @enderror" id="tipo_sangre" name="tipo_sangre">
+                        <select class="form-select @error('tipo_sangre') is-invalid @enderror" id="tipo_sangre" name="tipo_sangre">
                             <option value="">Seleccionar...</option>
                             @foreach(['A+','A-','B+','B-','AB+','AB-','O+','O-'] as $tipo)
                                 <option value="{{ $tipo }}" {{ old('tipo_sangre', $beneficiario->tipo_sangre) == $tipo ? 'selected' : '' }}>{{ $tipo }}</option>
@@ -307,7 +307,7 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label for="nivel_educativo" class="form-label">Grado de Instrucción</label>
-                        <select class="form-control @error('nivel_educativo') is-invalid @enderror" id="nivel_educativo" name="nivel_educativo">
+                        <select class="form-select @error('nivel_educativo') is-invalid @enderror" id="nivel_educativo" name="nivel_educativo">
                             <option value="">Seleccionar...</option>
                             <option value="ninguno" {{ old('nivel_educativo', $beneficiario->nivel_educativo) == 'ninguno' ? 'selected' : '' }}>Ninguno</option>
                             <option value="primaria" {{ old('nivel_educativo', $beneficiario->nivel_educativo) == 'primaria' ? 'selected' : '' }}>Primaria</option>
@@ -552,7 +552,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="estado_beneficiario" class="form-label">Estado del Beneficiario</label>
-                        <select class="form-control @error('estado_beneficiario') is-invalid @enderror" id="estado_beneficiario" name="estado_beneficiario">
+                        <select class="form-select @error('estado_beneficiario') is-invalid @enderror" id="estado_beneficiario" name="estado_beneficiario">
                             <option value="activo" {{ old('estado_beneficiario', $beneficiario->estado_beneficiario) == 'activo' ? 'selected' : '' }}>Activo</option>
                             <option value="inactivo" {{ old('estado_beneficiario', $beneficiario->estado_beneficiario) == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
                             <option value="suspendido" {{ old('estado_beneficiario', $beneficiario->estado_beneficiario) == 'suspendido' ? 'selected' : '' }}>Suspendido</option>
