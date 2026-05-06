@@ -23,7 +23,14 @@ class OrdenesController extends Controller
         $productos = Producto::all();
         if ($tipo == 'entrega') {
             $beneficiarios = Beneficiario::all();
-            return view('ordenes.create', compact('tipo', 'beneficiarios', 'productos'));
+
+            // Mapa beneficiario_id => [producto_ids entregados]
+            $productosEntregadosPorBeneficiario = OrdenEntrega::with('items')
+                ->get()
+                ->groupBy('beneficiario_id')
+                ->map(fn($ordenes) => $ordenes->flatMap(fn($o) => $o->items->pluck('producto_id'))->unique()->values());
+
+            return view('ordenes.create', compact('tipo', 'beneficiarios', 'productos', 'productosEntregadosPorBeneficiario'));
         }
         return view('ordenes.create', compact('tipo', 'productos'));
     }

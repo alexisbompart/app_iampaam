@@ -227,10 +227,74 @@ class BeneficiariosController extends Controller
     {
         $beneficiario->delete();
 
-        // Limpiar caché del dashboard para reflejar cambios en las estadísticas
         Cache::forget('dashboard_stats');
         Cache::forget('dashboard_ordenes_mensuales');
 
         return redirect()->route('beneficiarios.index')->with('success', 'Beneficiario eliminado exitosamente.');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $query = Beneficiario::query();
+
+        if ($request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                  ->orWhere('cedula', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filter == 'activos') {
+            $query->where('estado_beneficiario', 'activo');
+        } elseif ($request->filter == 'inactivos') {
+            $query->where('estado_beneficiario', 'inactivo');
+        }
+
+        $beneficiarios = $query->orderBy('created_at', 'desc')->get();
+
+        $filename = 'beneficiarios_' . now()->format('Ymd_His') . '.xlsx';
+
+        $headers = [
+            'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($beneficiarios) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM UTF-8
+
+            fputcsv($handle, [
+                'ID', 'Nombre', 'Cédula', 'Edad', 'Género', 'Estado Civil',
+                'Teléfono', 'Teléfono Alt.', 'Email', 'Dirección',
+                'Estado', 'Municipio', 'Parroquia',
+                'Estado Beneficiario', 'Fecha Ingreso', 'Persona Referencia',
+            ], ';');
+
+            foreach ($beneficiarios as $b) {
+                fputcsv($handle, [
+                    $b->id,
+                    $b->nombre,
+                    $b->cedula ?? '',
+                    $b->edad ?? '',
+                    $b->genero ?? '',
+                    $b->estado_civil ?? '',
+                    $b->telefono ?? '',
+                    $b->telefono_alternativo ?? '',
+                    $b->email ?? '',
+                    $b->direccion ?? '',
+                    $b->estado ?? '',
+                    $b->municipio ?? '',
+                    $b->parroquia ?? '',
+                    $b->estado_beneficiario ?? '',
+                    $b->fecha_ingreso ? $b->fecha_ingreso->format('d/m/Y') : ($b->created_at ? $b->created_at->format('d/m/Y') : ''),
+                    $b->persona_referencia ?? '',
+                ], ';');
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

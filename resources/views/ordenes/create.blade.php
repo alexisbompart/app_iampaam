@@ -37,6 +37,13 @@
         </h1>
         <p class="text-center text-muted mb-4">Instituto de Atención al Adulto Mayor y Protección a la Ancianidad</p>
 
+        @if($tipo == 'entrega')
+        <div id="alerta-duplicado" class="alert alert-warning d-none mx-3 mt-2" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Advertencia:</strong> <span id="alerta-duplicado-texto"></span>
+        </div>
+        @endif
+
         <form action="{{ route('ordenes.store', $tipo) }}" method="POST">
             @csrf
 
@@ -139,6 +146,48 @@
 </div>
 
 <script>
+@if($tipo == 'entrega')
+const productosEntregados = @json($productosEntregadosPorBeneficiario);
+
+const productoNombres = {};
+@foreach($productos as $p)
+    productoNombres[{{ $p->id }}] = "{{ addslashes($p->nombre) }}";
+@endforeach
+
+function verificarDuplicados() {
+    const beneficiarioId = document.getElementById('beneficiario_id')?.value;
+    const alerta = document.getElementById('alerta-duplicado');
+    const alertaTexto = document.getElementById('alerta-duplicado-texto');
+
+    if (!beneficiarioId || !productosEntregados[beneficiarioId]) {
+        alerta.classList.add('d-none');
+        return;
+    }
+
+    const entregados = productosEntregados[beneficiarioId].map(Number);
+    const seleccionados = Array.from(document.querySelectorAll('select[name="productos[]"]'))
+        .map(s => Number(s.value))
+        .filter(v => v && entregados.includes(v));
+
+    const nombres = [...new Set(seleccionados)].map(id => productoNombres[id] || 'Producto #' + id);
+
+    if (nombres.length > 0) {
+        alertaTexto.textContent = 'El beneficiario ya recibió: ' + nombres.join(', ') + '. Verifique antes de continuar.';
+        alerta.classList.remove('d-none');
+    } else {
+        alerta.classList.add('d-none');
+    }
+}
+
+document.getElementById('beneficiario_id').addEventListener('change', verificarDuplicados);
+document.addEventListener('change', function(e) {
+    if (e.target.matches('select[name="productos[]"]')) verificarDuplicados();
+});
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.remove-item')) setTimeout(verificarDuplicados, 50);
+});
+@endif
+
 document.getElementById('add-item').addEventListener('click', function() {
     const items = document.getElementById('items');
     const newRow = items.querySelector('.item-row').cloneNode(true);

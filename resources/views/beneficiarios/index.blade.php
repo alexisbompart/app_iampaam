@@ -122,21 +122,30 @@
 
     <!-- Search and Filters -->
     <div class="search-container">
-        <div class="row">
-            <div class="col-md-8">
-                <form method="GET" class="d-flex">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <form method="GET" class="d-flex" id="search-form">
                     <input type="text" name="search" class="form-control me-2" placeholder="Buscar por nombre o cédula..." value="{{ request('search') }}">
+                    @if(request('filter'))
+                        <input type="hidden" name="filter" value="{{ request('filter') }}">
+                    @endif
                     <button type="submit" class="btn btn-outline-success">
                         <i class="fas fa-search"></i>
                     </button>
                 </form>
             </div>
-            <div class="col-md-4 text-end">
+            <div class="col-md-3 text-center">
                 <div class="btn-group" role="group">
                     <a href="{{ route('beneficiarios.index') }}" class="btn btn-outline-secondary {{ !request('filter') ? 'active' : '' }}">Todos</a>
                     <a href="{{ route('beneficiarios.index', ['filter' => 'activos']) }}" class="btn btn-outline-success {{ request('filter') == 'activos' ? 'active' : '' }}">Activos</a>
                     <a href="{{ route('beneficiarios.index', ['filter' => 'inactivos']) }}" class="btn btn-outline-danger {{ request('filter') == 'inactivos' ? 'active' : '' }}">Inactivos</a>
                 </div>
+            </div>
+            <div class="col-md-3 text-end">
+                <a href="{{ route('beneficiarios.export', array_filter(['search' => request('search'), 'filter' => request('filter')])) }}"
+                   class="btn btn-success">
+                    <i class="fas fa-file-excel me-2"></i>Exportar Excel
+                </a>
             </div>
         </div>
     </div>

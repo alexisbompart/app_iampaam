@@ -22,6 +22,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::middleware(['role:admin,operador,consultor'])->group(function () {
+        Route::get('beneficiarios/export', [BeneficiariosController::class, 'exportExcel'])->name('beneficiarios.export');
         Route::resource('beneficiarios', BeneficiariosController::class);
     });
 
